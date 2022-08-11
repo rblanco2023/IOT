@@ -16,15 +16,18 @@ async function startDatabase() {
     const uri = mongod.getUri();	
     const connection = await MongoClient.connect(uri, {useNewUrlParser: true});
     database = connection.db();
+    console.log("Log: Se ha creado la base de datos")
 }
 
 async function getDatabase() {
     if (!database) await startDatabase();
+    console.log("Log: Base de datos iniciada")
     return database;
 }
 
 async function insertMeasurement(message) {
     const {insertedId} = await database.collection(collectionName).insertOne(message);
+    
     return insertedId;
 }
 
@@ -90,9 +93,9 @@ function render(template, vars) {
 	   }
            line = line.replace(match[0], result ? result : '');
 	   match = line.match(regexp);
-       }	       
+      }
        return line;
-   }).join('\n');	
+   }).join('\n');
 }
 
 app.get('/web/device/:id', function (req,res) {
@@ -107,9 +110,9 @@ app.get('/web/device/:id', function (req,res) {
 
 
     var device = db.public.many("SELECT * FROM devices WHERE device_id = '"+req.params.id+"'");
-    console.log(device);
+   // res.send('{"device_id":"'+device[0].device_id+'","name":"'+device[0].name+'","key":"'+device[0].key+'"}');
     res.send(render(template,{id:device[0].device_id, key: device[0].key, name:device[0].name}));
-});	
+});
 
 
 app.get('/term/device/:id', function (req, res) {
@@ -127,6 +130,14 @@ app.get('/term/device/:id', function (req, res) {
 
 app.get('/measurement', async (req,res) => {
     res.send(await getMeasurements());
+});
+
+app.get('/device/:id', function(req, res){
+    var device = db.public.many("SELECT * FROM devices WHERE device_id = '"+req.params.id+"'")
+// Imprimo en cónsola
+    console.log(device);
+    res.send('{"device_id":"'+device[0].device_id+'","name":"'+device[0].name+'","key":"'+device[0].key+'"}');
+// Fin imprimo en cónsola
 });
 
 app.get('/device', function(req,res) {
@@ -190,6 +201,8 @@ startDatabase().then(async() => {
     db.public.none("INSERT INTO users VALUES ('1','Ana','admin123')");
     db.public.none("INSERT INTO users VALUES ('2','Beto','user123')");
 
+    console.log("Se agregó device:1, usuario:Ana, password:admin123")
+    console.log("Se agregó device:2, usuario:Beto, password:user123")
     console.log("sql device database up");
 
     app.listen(PORT, () => {
