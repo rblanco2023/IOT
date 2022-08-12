@@ -5,7 +5,7 @@
 
 
 
-TEMP=$(curl https://api.openweathermap.org/data/2.5/weather\?appid\=\{ebfacfed3054e999df1c086445cc6e6a\}\&q\=bariloche -H "Accept: application/json" | jq '.main.temp')
+TEMP=$(curl https://api.openweathermap.org/data/2.5/weather\?appid\=\{ebfacfed3054e999df1c086445cc6e6a\}\&q\=bariloche -H "Accept: application/json" | jq '.main.temp'-273)
 
 SENSOR_ID=02
 NAME='Bariloche'
